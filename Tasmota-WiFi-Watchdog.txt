@@ -1,0 +1,89 @@
+Tasmota template for Prokord PSH-WS007-EU WiFi Socket:
+	{"NAME":"","GPIO":[0,0,320,0,0,2720,0,0,2624,32,2656,224,0,4704],"FLAG":0,"BASE":18}
+
+1.
+Compile a new firmware with #define USE_PING
+Uncomment the line in my_user_config.h
+	 #define USE_PING
+
+2.
+In console set WifiConfig to 4 = retry other AP without rebooting.
+This prevents Tasmota rebootin without WiFi connection.
+https://tasmota.github.io/docs/Commands/#wi-fi
+	WifiConfig 4
+
+3.
+Watchdog rule
+
+Because System#Boot triggers after Wi-Fi and MQTT (if enabled) are connected, use System#Init.
+Because Time#Minute requires that time is set, use RuleTimer which won't need time and WiFi
+If you have another rule using ping, define IP address in Ping#?#Success so it's eg. Ping#8.8.8.8#Success
+
+
+Rule1
+ON system#init DO Var1 60 ENDON
+ON system#init DO Var2 640 ENDON
+ON system#init DO Var3 5 ENDON
+ON system#init DO Var16 8.8.8.8 ENDON
+ON system#init DO Var5 0 ENDON
+ON system#init DO Power1 1 ENDON
+ON system#init DO Var4 %Var3% ENDON
+ON system#init DO RuleTimer1 %Var1% ENDON
+ON Var4#State>%Var2% DO Var4 %Var2% ENDON
+ON Rules#Timer=1 DO backlog RuleTimer1 %Var1%; Ping4 %Var16% ENDON
+ON Ping#?#Success==0 DO backlog Add5 1; Power1 1 ENDON
+ON Ping#?#Success>0 DO backlog Var4 %Var3%; Var5 0; Power1 1 ENDON
+ON Var5#State>=%Var4% DO backlog Mult4 2; Var5 0; Power1 0; Delay 100; Power1 1 ENDON
+
+Paste rule into Tasmota console, enable rule1 and restart.
+	Rule1 1
+	Restart 1
+
+
+Config:
+Var1 <seconds>	- Ping test will run every <seconds> s. Four ping packets are send (ping4).
+Var2 <minutes> 	- Maximum limit for Var4.
+Var3 <minutes>	- Initial value for Var4.
+Var16 <IP>		- IP address for ping test.
+
+Do not edit variables:
+Var4 <n>		- Required consecutive failed ping tests after router is power cycled.
+				  Is doubled evertime power is cycled until max value %Var2% is reached.
+				  Restored back to the initial value %Var3% after successfull ping test.
+Var5 <n>		- Counts consecutive failed ping tests.
+
+When power is cycled, power is off for 10 seconds (Delay 100).
+
+If power is pressed off, power is turned back when next ping test ends.
+
+Four ping packets are sent in each ping test. Ping test fails if all packets time out.
+	tasmota/tasmota_xdrv_driver/xdrv_38_ping.ino
+		const uint32_t Ping_timeout_ms = 1000;    // default time-out of 1 second, which is enough for LAN/WIFI
+		const uint32_t Ping_coarse = 1000;        // interval between sending packets, 1 packet every second
+
+
+Example of power cycles if ping is continuously failing. One fail is about one minute.
+
+Time eg. 00:00
+5 x fail, 5min
+Power cycle, 00:05
+10 x fail, 10min
+Power cycle, 00:15
+20 x fail, 20min
+Power cycle, 00:35
+40 x fail, 40min
+Power cycle, 01:15
+80 x fail, 1h 20min
+Power cycle, 02:35
+160 x fail, 2h 40min
+Power cycle, 05:15
+320 x fail, 5h, 20min
+Power cycle, 10:35
+640 x fail, 10h, 40min
+Power cycle, 21:15
+640 x fail, 10h, 40min
+Power cycle, 07:55
+640 x fail, 10h, 40min
+...
+
+
