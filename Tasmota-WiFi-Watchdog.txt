@@ -7,7 +7,7 @@ Uncomment the line in my_user_config.h
 	 #define USE_PING
 
 2.
-In console set WifiConfig to 4 = retry other AP without rebooting.
+In console, set WifiConfig to 4 = retry other AP without rebooting.
 This prevents Tasmota rebootin without WiFi connection.
 https://tasmota.github.io/docs/Commands/#wi-fi
 	WifiConfig 4
@@ -47,14 +47,14 @@ Var3 <minutes>	- Initial value for Var4.
 Var16 <IP>		- IP address for ping test.
 
 Do not edit variables:
-Var4 <n>		- Required consecutive failed ping tests after router is power cycled.
-				  Is doubled evertime power is cycled until max value %Var2% is reached.
-				  Restored back to the initial value %Var3% after successfull ping test.
+Var4 <n>		- Required consecutive failed ping tests after the router is power cycled.
+				  Is doubled every time power is cycled until max value %Var2% is reached.
+				  Restored back to the initial value %Var3% after successful ping test.
 Var5 <n>		- Counts consecutive failed ping tests.
 
-When power is cycled, power is off for 10 seconds (Delay 100).
+When the power is cycled, the power is off for 10 seconds (Delay 100).
 
-If power is pressed off, power is turned back when next ping test ends.
+If the power is pressed off, power is turned back when the next ping test ends.
 
 Four ping packets are sent in each ping test. Ping test fails if all packets time out.
 	tasmota/tasmota_xdrv_driver/xdrv_38_ping.ino
@@ -62,7 +62,7 @@ Four ping packets are sent in each ping test. Ping test fails if all packets tim
 		const uint32_t Ping_coarse = 1000;        // interval between sending packets, 1 packet every second
 
 
-Example of power cycles if ping is continuously failing. One fail is about one minute.
+Example of power cycles if ping is continuously failing. One failure is about one minute.
 
 Time eg. 00:00
 5 x fail, 5min
