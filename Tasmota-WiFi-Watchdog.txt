@@ -33,7 +33,7 @@ ON Var4#State>%Var2% DO Var4 %Var2% ENDON
 ON Rules#Timer=1 DO backlog RuleTimer1 %Var1%; Ping4 %Var16% ENDON
 ON Ping#?#Success==0 DO backlog Add5 1; Power1 1 ENDON
 ON Ping#?#Success>0 DO backlog Var4 %Var3%; Var5 0; Power1 1 ENDON
-ON Var5#State>=%Var4% DO backlog Mult4 2; Var5 0; Power1 0; Delay 100; Power1 1 ENDON
+ON Var5#State>=%Var4% DO backlog Mult4 2; Var5 0; Mem10 %timestamp%; Power1 0; Delay 100; Power1 1 ENDON
 
 Paste rule into Tasmota console, enable rule1 and restart.
 	Rule1 1
@@ -47,10 +47,11 @@ Var3 <minutes>	- Initial value for Var4.
 Var16 <IP>		- IP address for ping test.
 
 Do not edit variables:
-Var4 <n>		- Required consecutive failed ping tests after the router is power cycled.
+Var4			- Required consecutive failed ping tests after the router is power cycled.
 				  Is doubled every time power is cycled until max value %Var2% is reached.
 				  Restored back to the initial value %Var3% after successful ping test.
-Var5 <n>		- Counts consecutive failed ping tests.
+Var5			- Counts consecutive failed ping tests.
+Mem10			- Timestamp of the last power cycle if time is synchronized. eg. 2023-08-27T16:04:11
 
 When the power is cycled, the power is off for 10 seconds (Delay 100).
 
