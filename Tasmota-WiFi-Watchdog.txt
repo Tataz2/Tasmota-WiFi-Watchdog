@@ -22,7 +22,7 @@ If you have another rule using ping, define IP address in Ping#?#Success so it's
 
 Rule1
 ON system#init DO Var1 60 ENDON
-ON system#init DO Var2 640 ENDON
+ON system#init DO Var2 1440 ENDON
 ON system#init DO Var3 5 ENDON
 ON system#init DO Var16 8.8.8.8 ENDON
 ON system#init DO Var5 0 ENDON
@@ -42,7 +42,7 @@ Paste rule into Tasmota console, enable rule1 and restart.
 
 Config:
 Var1 <seconds>	- Ping test will run every <seconds> s. Four ping packets are send (ping4).
-Var2 <minutes> 	- Maximum limit for Var4.
+Var2 <minutes> 	- Maximum limit for Var4. 24 hours is 1440*60s
 Var3 <minutes>	- Initial value for Var4.
 Var16 <IP>		- IP address for ping test.
 
@@ -65,26 +65,35 @@ Four ping packets are sent in each ping test. Ping test fails if all packets tim
 
 Example of power cycles if ping is continuously failing. One failure is about one minute.
 
-Time eg. 00:00
+Time eg. day 1 00:00
 5 x fail, 5min
 Power cycle, 00:05
-10 x fail, 10min
-Power cycle, 00:15
-20 x fail, 20min
-Power cycle, 00:35
-40 x fail, 40min
-Power cycle, 01:15
-80 x fail, 1h 20min
-Power cycle, 02:35
-160 x fail, 2h 40min
-Power cycle, 05:15
-320 x fail, 5h, 20min
-Power cycle, 10:35
-640 x fail, 10h, 40min
-Power cycle, 21:15
-640 x fail, 10h, 40min
-Power cycle, 07:55
-640 x fail, 10h, 40min
-...
 
+10 x fail, 10min
+Power cycle, day 1 00:15
+
+20 x fail, 20min
+Power cycle, day 1 00:35
+
+40 x fail, 40min
+Power cycle, day 1 01:15
+
+80 x fail, 1h 20min
+Power cycle, day 1 02:35
+
+160 x fail, 2h 40min
+Power cycle, day 1 05:15
+
+320 x fail, 5h, 20min
+Power cycle, day 1 10:35
+
+640 x fail, 10h, 40min
+Power cycle, day 1 21:15
+
+1280 x fail, 21h, 20min
+Power cycle, day 2 18:35
+
+1440 x fail, 24h, 0min
+Power cycle, day 3 18:35
+...
 
